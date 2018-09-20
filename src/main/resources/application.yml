@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: spring-boot-vuejs
+  main:
+    banner-mode: "off"
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: testDb
