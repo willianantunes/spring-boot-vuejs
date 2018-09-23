@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Jafar",
+    "email": "jafar@agrabah.com",
+    "password": "$2a$10$WuVa.QCm15lWJ7pND6G95.XT8qVIZxQEzvfigUStx7G.18ebPpi8K",
+    "products": [
+      {
+        "code": "LAMBE-SAL-LOREM-123",
+        "name": "Salt Shaker",
+        "details": "A big honest salt shaker... Indeed is good, indeed!",
+        "price": "15.00",
+        "imageLink": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Salt_shaker_on_white_background.jpg/800px-Salt_shaker_on_white_background.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Iago",
+    "email": "iago@agrabah.com",
+    "password": "$2a$10$elH9xoM9txz9wYQ9vTXdYu95EE36xmYhzkJD0Lheo229gXt/ndmn.",
+    "products": [
+      {
+        "code": "LAMBE-SAL-LOREM-321",
+        "name": "Salt Shaker",
+        "details": "A big honest salt shaker... Indeed is good, indeed!",
+        "price": "25.00",
+        "imageLink": "https://cdn.connox.fr/m/100107/226805/media/hay/Italienische-Streuer/Hay-Italienischer-Salzstreuer-Edelstahl.jpg"
+      }
+    ]
+  }
+]

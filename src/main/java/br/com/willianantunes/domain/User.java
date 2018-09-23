@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,12 +26,12 @@ public class User implements Serializable {
     public static final String COLLECTION_NAME = "wa_user";
 
     @Id
-    private String id;
+    private ObjectId id;
     @NotBlank
     private String name;
     @Email
     @NotNull
-    @Indexed
+    @Indexed(unique = true)
     private String email;
     @NotNull
     @Size(min = 60, max = 60)
