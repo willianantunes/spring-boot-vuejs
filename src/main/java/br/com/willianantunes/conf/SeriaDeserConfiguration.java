@@ -14,7 +14,7 @@ import org.zalando.problem.violations.ConstraintViolationProblemModule;
 public class SeriaDeserConfiguration {
 
     @Bean
-    Jackson2ObjectMapperBuilder jacksonBuilder() {
+    public Jackson2ObjectMapperBuilder jacksonBuilder() {
 
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
         builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -23,12 +23,14 @@ public class SeriaDeserConfiguration {
     }
 
     @Bean
-    JavaTimeModule javaTimeModule() {
+    public JavaTimeModule javaTimeModule() {
+
         return new JavaTimeModule();
     }
 
     @Bean
-    Jdk8Module jdk8TimeModule() {
+    public Jdk8Module jdk8TimeModule() {
+
         return new Jdk8Module();
     }
 
@@ -38,12 +40,16 @@ public class SeriaDeserConfiguration {
      * @see <a href="https://zalando.github.io/problem">Know more about Problem</a>
      */
     @Bean
-    ProblemModule problemModule() {
-        return new ProblemModule();
+    public ProblemModule problemModule() {
+
+        ProblemModule module = new ProblemModule();
+        module.withStackTraces(true);
+        return module;
     }
 
     @Bean
-    ConstraintViolationProblemModule constraintViolationProblemModule() {
+    public ConstraintViolationProblemModule constraintViolationProblemModule() {
+
         return new ConstraintViolationProblemModule();
     }
 }
