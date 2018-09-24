@@ -4,7 +4,10 @@ import br.com.willianantunes.domain.Product;
 import br.com.willianantunes.services.dtos.ProductDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductMapper {
@@ -39,5 +42,13 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .imageLink(product.getImageLink())
                 .build()).orElse(null);
+    }
+
+    public List<ProductDTO> productsToProductDTOs(List<Product> products) {
+
+        return products.stream()
+            .filter(Objects::nonNull)
+            .map(this::productToProductDTO)
+            .collect(Collectors.toList());
     }
 }

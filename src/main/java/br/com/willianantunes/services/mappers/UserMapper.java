@@ -2,6 +2,7 @@ package br.com.willianantunes.services.mappers;
 
 import br.com.willianantunes.domain.User;
 import br.com.willianantunes.services.dtos.UserDTO;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class UserMapper {
     public UserDTO userToUserDTO(User user) {
         return Optional.ofNullable(user).map(u ->
             UserDTO.builder()
+                .id(Optional.ofNullable(user.getId()).map(id -> id.toString()).orElse(null))
                 .name(user.getName())
                 .email(user.getEmail())
                 .password(user.getPassword())
@@ -33,6 +35,7 @@ public class UserMapper {
 
         return Optional.ofNullable(userDTO).map(u ->
             User.builder()
+                .id(Optional.ofNullable(userDTO.getId()).map(id -> new ObjectId(id)).orElse(null))
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
                 .password(userDTO.getPassword())

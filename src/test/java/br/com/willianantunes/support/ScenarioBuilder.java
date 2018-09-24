@@ -2,6 +2,8 @@ package br.com.willianantunes.support;
 
 import br.com.willianantunes.domain.User;
 import br.com.willianantunes.repositories.UserRepository;
+import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.mappers.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -13,6 +15,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Component
 public class ScenarioBuilder {
 
@@ -22,6 +26,8 @@ public class ScenarioBuilder {
     private ObjectMapper objectMapper;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserMapper userMapper;
 
     public void createMockedUsersOnDatabase() throws IOException {
 
@@ -31,6 +37,13 @@ public class ScenarioBuilder {
     public List<User> getMockedUsers() throws IOException {
 
         return List.of(objectMapper.readValue(getMockedUsersAsJson(), User[].class));
+    }
+
+    public List<UserDTO> getMockedUserDTOs() throws IOException {
+
+        return List.of(objectMapper.readValue(getMockedUsersAsJson(), User[].class)).stream()
+            .map(userMapper::userToUserDTO)
+            .collect(toList());
     }
 
     public String getMockedUsersAsJson() throws IOException {

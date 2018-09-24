@@ -60,8 +60,9 @@ public class ProductService {
             });
     }
 
-    public List<Product> getAllProductsFromUser(String userId) {
+    public List<ProductDTO> getAllProductsFromUser(String userId) {
 
-        return userRepository.findById(new ObjectId(userId)).map(u -> u.getProducts()).orElse(emptyList());
+        List<Product> products = userRepository.findById(new ObjectId(userId)).map(u -> u.getProducts()).orElse(emptyList());
+        return productMapper.productsToProductDTOs(products);
     }
 }

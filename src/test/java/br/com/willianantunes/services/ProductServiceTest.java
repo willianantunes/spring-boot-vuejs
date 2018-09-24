@@ -111,7 +111,7 @@ public class ProductServiceTest {
 
         User jafar = userRepository.findOneByEmail("jafar@agrabah.com").orElseThrow();
 
-        List<Product> jafarProducts = productService.getAllProductsFromUser(jafar.getId().toString());
+        List<ProductDTO> jafarProducts = productService.getAllProductsFromUser(jafar.getId().toString());
 
         assertThat(jafarProducts).hasSize(jafar.getProducts().size());
     }

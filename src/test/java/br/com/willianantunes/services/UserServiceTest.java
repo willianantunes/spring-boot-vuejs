@@ -52,7 +52,7 @@ public class UserServiceTest {
             .email("jafar@agrabah.com")
             .password("my-lovely-jafar-master").build();
 
-        User user = userService.createUser(userDTO);
+        UserDTO user = userService.createUser(userDTO);
 
         assertThat(user.getId()).isNotNull();
         assertThat(user.getPassword().length()).isEqualTo(60);
@@ -66,7 +66,7 @@ public class UserServiceTest {
 
         scenarioBuilder.createMockedUsersOnDatabase();
 
-        Optional<User> optionalJafar = userService.getUserByEmail("jafar@agrabah.com");
+        Optional<UserDTO> optionalJafar = userService.getUserByEmail("jafar@agrabah.com");
 
         assertThat(optionalJafar).isNotEmpty();
     }
@@ -77,7 +77,7 @@ public class UserServiceTest {
 
         scenarioBuilder.createMockedUsersOnDatabase();
 
-        List<User> users = userService.getAllUsers();
+        List<UserDTO> users = userService.getAllUsers();
 
         assertThat(users).hasSize(scenarioBuilder.getMockedUsers().size());
     }
@@ -89,7 +89,7 @@ public class UserServiceTest {
         scenarioBuilder.createMockedUsersOnDatabase();
 
         userService.deleteUserByEmail("jafar@agrabah.com");
-        List<User> users = userService.getAllUsers();
+        List<UserDTO> users = userService.getAllUsers();
 
         assertThat(users).hasSize(scenarioBuilder.getMockedUsers().size() - 1);
     }
