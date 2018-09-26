@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping(REQUEST_PATH_USER_GET_OR_DELETE)
-    public ResponseEntity<UserDTO> getBrand(@PathVariable String id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
 
         log.info("REST request to get User : {}", id);
 
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping(REQUEST_PATH_USER_POST_OR_PUT)
-    public ResponseEntity<UserDTO> createBrand(@Valid @RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO user) {
 
         log.info("REST request to save User : {}", user);
 
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PutMapping(REQUEST_PATH_USER_POST_OR_PUT)
-    public ResponseEntity<UserDTO> updateBrand(@Valid @RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO user) {
 
         log.info("REST request to update User : {}", user);
 
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @DeleteMapping(REQUEST_PATH_USER_GET_OR_DELETE)
-    public ResponseEntity<Void> deleteCompany(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
 
         log.info("REST request to delete User : {}", id);
 
