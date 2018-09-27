@@ -2,8 +2,8 @@ package br.com.willianantunes.controllers;
 
 import br.com.willianantunes.controllers.util.ResponseUtil;
 import br.com.willianantunes.services.UserService;
-import br.com.willianantunes.services.dtos.UserDTO;
 import br.com.willianantunes.services.dtos.UserCreateDTO;
+import br.com.willianantunes.services.dtos.UserDTO;
 import br.com.willianantunes.services.dtos.UserUpdateDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.willianantunes.controllers.components.UrlBuilder.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequestMapping(REQUEST_PATH_API)
@@ -27,7 +28,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(REQUEST_PATH_USER_GET_ALL)
+    @GetMapping(value = REQUEST_PATH_USER_GET_ALL, produces = APPLICATION_JSON_UTF8_VALUE)
     public List<UserDTO> users() {
 
         log.info("REST request to get all Users");
@@ -35,7 +36,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping(REQUEST_PATH_USER_GET_OR_DELETE)
+    @GetMapping(value = REQUEST_PATH_USER_GET_OR_DELETE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
 
         log.info("REST request to get User : {}", id);
@@ -45,7 +46,7 @@ public class UserController {
         return ResponseUtil.wrapOrNotFound(user);
     }
 
-    @PostMapping(REQUEST_PATH_USER_POST_OR_PUT)
+    @PostMapping(value = REQUEST_PATH_USER_POST_OR_PUT, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateDTO user) {
 
         log.info("REST request to save User : {}", user);
@@ -55,7 +56,7 @@ public class UserController {
         return ResponseEntity.created(new UriTemplate(REQUEST_PATH_API + REQUEST_PATH_USER_GET_OR_DELETE).expand(result.getId())).body(result);
     }
 
-    @PutMapping(REQUEST_PATH_USER_POST_OR_PUT)
+    @PutMapping(value = REQUEST_PATH_USER_POST_OR_PUT, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserUpdateDTO user) {
 
         log.info("REST request to update User : {}", user);
@@ -65,7 +66,7 @@ public class UserController {
         return ResponseEntity.ok().body(result);
     }
 
-    @DeleteMapping(REQUEST_PATH_USER_GET_OR_DELETE)
+    @DeleteMapping(value = REQUEST_PATH_USER_GET_OR_DELETE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
 
         log.info("REST request to delete User : {}", id);
