@@ -1,7 +1,9 @@
 package br.com.willianantunes.services.mappers;
 
 import br.com.willianantunes.domain.User;
+import br.com.willianantunes.services.dtos.UserCreateDTO;
 import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.dtos.UserUpdateDTO;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +16,12 @@ import java.util.stream.Collectors;
 public class UserMapper {
 
     public UserDTO userToUserDTO(User user) {
+
         return Optional.ofNullable(user).map(u ->
             UserDTO.builder()
                 .id(Optional.ofNullable(user.getId()).map(id -> id.toString()).orElse(null))
                 .name(user.getName())
                 .email(user.getEmail())
-                .password(user.getPassword())
                 .build()).orElse(null);
     }
 
@@ -38,7 +40,6 @@ public class UserMapper {
                 .id(Optional.ofNullable(userDTO.getId()).map(id -> new ObjectId(id)).orElse(null))
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
                 .build()).orElse(null);
     }
 
@@ -48,5 +49,26 @@ public class UserMapper {
             .filter(Objects::nonNull)
             .map(this::userDTOToUser)
             .collect(Collectors.toList());
+    }
+
+    public User userCreateDTOToUser(UserCreateDTO userCreateDTO) {
+
+        return Optional.ofNullable(userCreateDTO).map(u ->
+            User.builder()
+                .name(userCreateDTO.getName())
+                .email(userCreateDTO.getEmail())
+                .password(userCreateDTO.getPassword())
+                .build()).orElse(null);
+    }
+
+    public User userUpdateDTOToUser(UserUpdateDTO userUpdateDTO) {
+
+        return Optional.ofNullable(userUpdateDTO).map(u ->
+            User.builder()
+                .id(new ObjectId(userUpdateDTO.getId()))
+                .name(userUpdateDTO.getName())
+                .email(userUpdateDTO.getEmail())
+                .password(userUpdateDTO.getPassword())
+                .build()).orElse(null);
     }
 }

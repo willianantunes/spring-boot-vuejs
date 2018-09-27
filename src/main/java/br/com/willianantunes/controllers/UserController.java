@@ -1,9 +1,10 @@
 package br.com.willianantunes.controllers;
 
-import br.com.willianantunes.controllers.excep.BadRequestException;
 import br.com.willianantunes.controllers.util.ResponseUtil;
 import br.com.willianantunes.services.UserService;
 import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.dtos.UserCreateDTO;
+import br.com.willianantunes.services.dtos.UserUpdateDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping(REQUEST_PATH_USER_POST_OR_PUT)
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateDTO user) {
 
         log.info("REST request to save User : {}", user);
 
@@ -55,11 +56,10 @@ public class UserController {
     }
 
     @PutMapping(REQUEST_PATH_USER_POST_OR_PUT)
-    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserUpdateDTO user) {
 
         log.info("REST request to update User : {}", user);
 
-        Optional.ofNullable(user.getId()).orElseThrow(BadRequestException::new);
         UserDTO result = userService.updateUser(user);
 
         return ResponseEntity.ok().body(result);

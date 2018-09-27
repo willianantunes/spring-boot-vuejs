@@ -1,9 +1,9 @@
 package br.com.willianantunes.controllers;
 
-import br.com.willianantunes.controllers.excep.BadRequestException;
-import br.com.willianantunes.domain.User;
 import br.com.willianantunes.services.UserService;
+import br.com.willianantunes.services.dtos.UserCreateDTO;
 import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.dtos.UserUpdateDTO;
 import br.com.willianantunes.support.ScenarioBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -17,16 +17,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.util.UriTemplate;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static br.com.willianantunes.controllers.components.UrlBuilder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
@@ -64,7 +63,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Should return a user when is found")
+    @DisplayName("Should return an user when his is found by ID")
     public void b() throws Exception {
 
         UserDTO anyUser = scenarioBuilder.getMockedUserDTOs().stream().findAny().orElseThrow();
@@ -100,19 +99,23 @@ public class UserControllerTest {
     public void d() throws Exception {
 
         UserDTO anyUser = scenarioBuilder.getMockedUserDTOs().stream().findAny().orElseThrow();
-        UserDTO createdUser = new UserDTO(anyUser);
-        createdUser.setId("fake-id");
 
-        when(userService.createUser(eq(anyUser))).thenReturn(createdUser);
+        UserCreateDTO userCreateDTO = UserCreateDTO.builder()
+            .email(anyUser.getEmail())
+            .name(anyUser.getName())
+            .password("my-custom-honest-password")
+            .build();
+
+        when(userService.createUser(eq(userCreateDTO))).thenReturn(anyUser);
 
         mockMvc.perform(post(REQUEST_PATH_API + REQUEST_PATH_USER_POST_OR_PUT)
-            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(anyUser)))
+            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(userCreateDTO)))
             .andDo(print())
             .andExpect(status().isCreated())
-            .andExpect(header().string("Location", equalTo(new UriTemplate(REQUEST_PATH_API + REQUEST_PATH_USER_GET_OR_DELETE).expand(createdUser.getId()).toString())))
+            .andExpect(header().string("Location", equalTo(new UriTemplate(REQUEST_PATH_API + REQUEST_PATH_USER_GET_OR_DELETE).expand(anyUser.getId()).toString())))
             .andExpect(content().contentType(APPLICATION_JSON_UTF8));
 
-        verify(userService).createUser(eq(anyUser));
+        verify(userService).createUser(eq(userCreateDTO));
     }
 
     @Test
@@ -120,12 +123,17 @@ public class UserControllerTest {
     public void e() throws Exception {
 
         UserDTO anyUser = scenarioBuilder.getMockedUserDTOs().stream().findAny().orElseThrow();
-        anyUser.setEmail(null);
+
+        UserCreateDTO userCreateDTO = UserCreateDTO.builder()
+            .name("Salt Man")
+            .email("honest-salt-shaker@salt.com")
+            .build();
 
         mockMvc.perform(post(REQUEST_PATH_API + REQUEST_PATH_USER_POST_OR_PUT)
             .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(anyUser)))
             .andDo(print())
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.violations[0].field", equalTo("password")));
     }
 
     @Test
@@ -134,35 +142,42 @@ public class UserControllerTest {
 
         UserDTO anyUser = scenarioBuilder.getMockedUserDTOs().stream().findAny().orElseThrow();
 
-        anyUser.setId("fake-id");
-        anyUser.setEmail("fake-email@agrabah.com");
+        UserUpdateDTO userUpdateDTO = UserUpdateDTO.builder()
+            .id("fake-id")
+            .name("Fake name")
+            .email(anyUser.getEmail())
+            .password("my-salted-password")
+            .build();
 
-        when(userService.updateUser(eq(anyUser))).thenReturn(anyUser);
+        when(userService.updateUser(eq(userUpdateDTO))).thenReturn(anyUser);
 
         mockMvc.perform(put(REQUEST_PATH_API + REQUEST_PATH_USER_POST_OR_PUT)
-            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(anyUser)))
+            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(userUpdateDTO)))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.email", equalTo(anyUser.getEmail())));
 
-        verify(userService).updateUser(eq(anyUser));
+        verify(userService).updateUser(eq(userUpdateDTO));
     }
 
     @Test
     @DisplayName("Should return 400 when the provided user is not valid to be updated when ID is not available")
     public void g() throws Exception {
 
-        UserDTO anyUser = scenarioBuilder.getMockedUserDTOs().stream().findAny().orElseThrow();
-        anyUser.setId(null);
+        UserUpdateDTO userUpdateDTO = UserUpdateDTO.builder()
+            .name("Salt Man")
+            .email("salt-shaker@salt.com")
+            .password("my-salted-password")
+            .build();
 
         MvcResult result = mockMvc.perform(put(REQUEST_PATH_API + REQUEST_PATH_USER_POST_OR_PUT)
-            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(anyUser)))
+            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(userUpdateDTO)))
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andReturn();
 
-        assertThat(result.getResolvedException()).isInstanceOf(BadRequestException.class);
+        assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
     }
 
     @Test

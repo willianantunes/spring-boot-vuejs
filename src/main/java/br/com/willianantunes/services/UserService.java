@@ -2,7 +2,9 @@ package br.com.willianantunes.services;
 
 import br.com.willianantunes.domain.User;
 import br.com.willianantunes.repositories.UserRepository;
+import br.com.willianantunes.services.dtos.UserCreateDTO;
 import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.dtos.UserUpdateDTO;
 import br.com.willianantunes.services.mappers.UserMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +24,11 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public UserDTO createUser(UserDTO userDTO) {
+    public UserDTO createUser(UserCreateDTO userCreateDTO) {
 
-        User user = userMapper.userDTOToUser(userDTO);
+        User user = userMapper.userCreateDTOToUser(userCreateDTO);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(configurePassword(user.getPassword()));
 
         return userMapper.userToUserDTO(userRepository.save(user));
     }
@@ -62,10 +64,19 @@ public class UserService {
         return userRepository.findById(new ObjectId(id)).map(userMapper::userToUserDTO);
     }
 
-    public UserDTO updateUser(UserDTO userDTO) {
+    public UserDTO updateUser(UserUpdateDTO userUpdateDTO) {
 
-        User user = userMapper.userDTOToUser(userDTO);
+        User user = userMapper.userUpdateDTOToUser(userUpdateDTO);
+
+        Optional.ofNullable(user.getPassword())
+            .ifPresentOrElse(p -> user.setPassword(configurePassword(p)),
+                () -> userRepository.findById(user.getId()).ifPresent(u -> user.setPassword(u.getPassword())));
 
         return userMapper.userToUserDTO(userRepository.save(user));
+    }
+
+    private String configurePassword(String password) {
+
+        return passwordEncoder.encode(password);
     }
 }

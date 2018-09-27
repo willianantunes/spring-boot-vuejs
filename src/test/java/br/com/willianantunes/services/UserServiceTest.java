@@ -1,7 +1,10 @@
 package br.com.willianantunes.services;
 
 import br.com.willianantunes.domain.User;
+import br.com.willianantunes.repositories.UserRepository;
+import br.com.willianantunes.services.dtos.UserCreateDTO;
 import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.dtos.UserUpdateDTO;
 import br.com.willianantunes.services.mappers.UserMapper;
 import br.com.willianantunes.support.ScenarioBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +31,8 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @SpyBean
     private PasswordEncoder passwordEncoder;
@@ -47,17 +52,18 @@ public class UserServiceTest {
     @DisplayName("Should create user when DTO is valid")
     public void a() {
 
-        UserDTO userDTO = UserDTO.builder()
+        UserCreateDTO userCreateDTO = UserCreateDTO.builder()
             .name("Jafar")
             .email("jafar@agrabah.com")
             .password("my-lovely-jafar-master").build();
 
-        UserDTO user = userService.createUser(userDTO);
+        UserDTO user = userService.createUser(userCreateDTO);
 
         assertThat(user.getId()).isNotNull();
-        assertThat(user.getPassword().length()).isEqualTo(60);
-        verify(passwordEncoder).encode(eq(userDTO.getPassword()));
-        verify(userMapper).userDTOToUser(eq(userDTO));
+        assertThat(user.getName()).isEqualTo(userCreateDTO.getName());
+        assertThat(user.getEmail()).isEqualTo(userCreateDTO.getEmail());
+        verify(passwordEncoder).encode(eq(userCreateDTO.getPassword()));
+        verify(userMapper).userCreateDTOToUser(eq(userCreateDTO));
     }
 
     @Test
@@ -92,5 +98,27 @@ public class UserServiceTest {
         List<UserDTO> users = userService.getAllUsers();
 
         assertThat(users).hasSize(scenarioBuilder.getMockedUsers().size() - 1);
+    }
+
+    @Test
+    @DisplayName("Should update the user with new name and e-mail")
+    public void e() throws IOException {
+
+        scenarioBuilder.createMockedUsersOnDatabase();
+
+        List<User> currentUsers = userRepository.findAll();
+        User anyUser = currentUsers.stream().findAny().orElseThrow();
+
+        UserUpdateDTO userUpdateDTO = UserUpdateDTO.builder()
+            .id(anyUser.getId().toString())
+            .name("MY NAME IS SALT SHAKER")
+            .email("salt-shaker@salt.com")
+            .build();
+
+        UserDTO userDTO = userService.updateUser(userUpdateDTO);
+
+        assertThat(userDTO.getName()).isEqualTo(userUpdateDTO.getName());
+        assertThat(userDTO.getEmail()).isEqualTo(userUpdateDTO.getEmail());
+        assertThat(currentUsers.size()).isEqualTo(userRepository.count());
     }
 }
