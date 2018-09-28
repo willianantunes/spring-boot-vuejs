@@ -1,7 +1,10 @@
 package br.com.willianantunes.services;
 
 import br.com.willianantunes.domain.Product;
+import br.com.willianantunes.domain.User;
+import br.com.willianantunes.repositories.ProductRepository;
 import br.com.willianantunes.repositories.UserRepository;
+import br.com.willianantunes.services.dtos.ProductCreateDTO;
 import br.com.willianantunes.services.dtos.ProductDTO;
 import br.com.willianantunes.services.mappers.ProductMapper;
 import org.bson.types.ObjectId;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -19,19 +23,22 @@ public class ProductService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private ProductRepository productRepository;
+    @Autowired
     private ProductMapper productMapper;
 
-    public void bindProductToUser(ProductDTO productDTO, String userId) {
+    public ProductDTO bindProductToUser(ProductCreateDTO productCreateDTO, String userId) {
 
-        userRepository.findById(new ObjectId(userId))
-            .ifPresent(user -> {
+        return userRepository.findById(new ObjectId(userId))
+            .map(user -> {
 
-                Product product = productMapper.productDTOToProduct(productDTO);
+                Product product = productMapper.productCreateDTOToProduct(productCreateDTO);
                 product.setId(new ObjectId().toString());
                 user.getProducts().add(product);
-
                 userRepository.save(user);
-            });
+
+               return product;
+            }).map(productMapper::productToProductDTO).orElseThrow();
     }
 
     public void deleteProductFromUser(String productId, String userId) {
@@ -62,7 +69,13 @@ public class ProductService {
 
     public List<ProductDTO> getAllProductsFromUser(String userId) {
 
-        List<Product> products = userRepository.findById(new ObjectId(userId)).map(u -> u.getProducts()).orElse(emptyList());
+        List<Product> products = userRepository.findById(new ObjectId(userId)).map(User::getProducts).orElse(emptyList());
+
         return productMapper.productsToProductDTOs(products);
+    }
+
+    public Optional<ProductDTO> getProductById(String productId) {
+
+        return productRepository.findById(productId).map(productMapper::productToProductDTO);
     }
 }

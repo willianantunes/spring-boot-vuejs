@@ -1,6 +1,7 @@
 package br.com.willianantunes.services.mappers;
 
 import br.com.willianantunes.domain.Product;
+import br.com.willianantunes.services.dtos.ProductCreateDTO;
 import br.com.willianantunes.services.dtos.ProductDTO;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class ProductMapper {
 
         return Optional.ofNullable(productDTO).map(u ->
             Product.builder()
+                .id(productDTO.getId())
                 .code(productDTO.getCode())
                 .name(productDTO.getName())
                 .details(productDTO.getDetails())
@@ -36,6 +38,7 @@ public class ProductMapper {
 
         return Optional.ofNullable(product).map(u ->
             ProductDTO.builder()
+                .id(Optional.ofNullable(product.getId()).orElse(null))
                 .code(product.getCode())
                 .name(product.getName())
                 .details(product.getDetails())
@@ -50,5 +53,17 @@ public class ProductMapper {
             .filter(Objects::nonNull)
             .map(this::productToProductDTO)
             .collect(Collectors.toList());
+    }
+
+    public Product productCreateDTOToProduct(ProductCreateDTO productCreateDTO) {
+
+        return Optional.ofNullable(productCreateDTO).map(u ->
+            Product.builder()
+                .code(productCreateDTO.getCode())
+                .name(productCreateDTO.getName())
+                .details(productCreateDTO.getDetails())
+                .price(productCreateDTO.getPrice())
+                .imageLink(productCreateDTO.getImageLink())
+                .build()).orElse(null);
     }
 }
