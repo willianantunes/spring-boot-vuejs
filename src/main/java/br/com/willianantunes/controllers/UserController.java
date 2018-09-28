@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping(value = REQUEST_PATH_USER_GET_OR_DELETE, produces = APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
+    public ResponseEntity<UserDTO> user(@PathVariable String id) {
 
         log.info("REST request to get User : {}", id);
 
