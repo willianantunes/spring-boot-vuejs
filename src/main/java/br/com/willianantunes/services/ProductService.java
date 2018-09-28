@@ -6,6 +6,7 @@ import br.com.willianantunes.repositories.ProductRepository;
 import br.com.willianantunes.repositories.UserRepository;
 import br.com.willianantunes.services.dtos.ProductCreateDTO;
 import br.com.willianantunes.services.dtos.ProductDTO;
+import br.com.willianantunes.services.dtos.ProductUpdateDTO;
 import br.com.willianantunes.services.mappers.ProductMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,16 @@ public class ProductService {
                 user.getProducts().add(product);
                 userRepository.save(user);
 
-               return product;
+                return product;
             }).map(productMapper::productToProductDTO).orElseThrow();
     }
 
-    public void deleteProductFromUser(String productId, String userId) {
+    public void deleteProductFromUser(String productId) {
 
-        userRepository.findById(new ObjectId(userId))
+        userRepository.findUserByProductId(productId)
+            .map(User::getId)
+            .map(userRepository::findById)
+            .map(Optional::get)
             .ifPresent(user -> {
 
                 user.getProducts().removeIf(product -> product.getId().equals(productId));
@@ -52,13 +56,17 @@ public class ProductService {
             });
     }
 
-    public void updateProductFromUser(String productId, ProductDTO productDTO, String userId) {
+    public void updateProductFromUser(ProductUpdateDTO productUpdateDTO) {
 
-        userRepository.findById(new ObjectId(userId))
+        userRepository.findUserByProductId(productUpdateDTO.getId())
+            .map(User::getId)
+            .map(userRepository::findById)
+            .map(Optional::get)
             .ifPresent(user -> {
 
                 List<Product> products = user.getProducts().stream()
-                    .map(product -> product.getId().equals(productId) ? productMapper.productDTOToProduct(productDTO, product.getId()) : product)
+                    .map(product -> product.getId().equals(productUpdateDTO.getId()) ?
+                        productMapper.productUpdateDTOToProduct(productUpdateDTO) : product)
                     .collect(toList());
 
                 user.setProducts(products);

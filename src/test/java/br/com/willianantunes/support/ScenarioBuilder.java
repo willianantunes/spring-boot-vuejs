@@ -2,7 +2,9 @@ package br.com.willianantunes.support;
 
 import br.com.willianantunes.domain.User;
 import br.com.willianantunes.repositories.UserRepository;
+import br.com.willianantunes.services.dtos.ProductDTO;
 import br.com.willianantunes.services.dtos.UserDTO;
+import br.com.willianantunes.services.mappers.ProductMapper;
 import br.com.willianantunes.services.mappers.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
@@ -30,6 +32,8 @@ public class ScenarioBuilder {
     private UserRepository userRepository;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private ProductMapper productMapper;
 
     public void createMockedUsersOnDatabase() throws IOException {
 
@@ -46,6 +50,15 @@ public class ScenarioBuilder {
             .forEach(p -> p.setId(new ObjectId().toString()));
 
         return users;
+    }
+
+    public List<ProductDTO> getMockedProductDTOs() throws IOException {
+
+        return getMockedUsers().stream()
+            .map(User::getProducts)
+            .flatMap(Collection::stream)
+            .map(productMapper::productToProductDTO)
+            .collect(toList());
     }
 
     public List<UserDTO> getMockedUserDTOs() throws IOException {

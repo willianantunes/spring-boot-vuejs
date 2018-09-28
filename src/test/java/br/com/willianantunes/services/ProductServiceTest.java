@@ -6,6 +6,7 @@ import br.com.willianantunes.repositories.ProductRepository;
 import br.com.willianantunes.repositories.UserRepository;
 import br.com.willianantunes.services.dtos.ProductCreateDTO;
 import br.com.willianantunes.services.dtos.ProductDTO;
+import br.com.willianantunes.services.dtos.ProductUpdateDTO;
 import br.com.willianantunes.services.mappers.ProductMapper;
 import br.com.willianantunes.support.ScenarioBuilder;
 import org.junit.jupiter.api.AfterEach;
@@ -89,7 +90,7 @@ public class ProductServiceTest {
         User jafar = userRepository.findOneByEmail("jafar@agrabah.com").orElseThrow();
         Product anyProduct = jafar.getProducts().stream().findAny().orElseThrow();
 
-        productService.deleteProductFromUser(anyProduct.getId(), jafar.getId().toString());
+        productService.deleteProductFromUser(anyProduct.getId());
 
         List<Product> currentProductsOfJafar = userRepository.findById(jafar.getId()).get().getProducts();
         assertThat(currentProductsOfJafar).hasSize(jafar.getProducts().size() - 1);
@@ -102,17 +103,21 @@ public class ProductServiceTest {
         User jafar = userRepository.findOneByEmail("jafar@agrabah.com").orElseThrow();
         Product anyProduct = jafar.getProducts().stream().findAny().orElseThrow();
 
-        ProductDTO productDTO = productMapper.productToProductDTO(anyProduct);
-        productDTO.setName("UPDATED FOO NAME");
-        productDTO.setPrice(new BigDecimal("69.00"));
+        ProductUpdateDTO productUpdateDTO = ProductUpdateDTO.builder()
+            .id(anyProduct.getId())
+            .code(anyProduct.getCode())
+            .name("MY-NEW-NAME")
+            .imageLink(anyProduct.getImageLink())
+            .price(new BigDecimal("15.30"))
+            .build();
 
-        productService.updateProductFromUser(anyProduct.getId(), productDTO, jafar.getId().toString());
+        productService.updateProductFromUser(productUpdateDTO);
 
-        verify(productMapper).productDTOToProduct(eq(productDTO), eq(anyProduct.getId()));
+        verify(productMapper).productUpdateDTOToProduct(productUpdateDTO);
         User updatedJafar = userRepository.findOneByEmail("jafar@agrabah.com").orElseThrow();
         assertThat(updatedJafar.getProducts().stream().filter(p -> p.getId().equals(anyProduct.getId())).findAny().orElseThrow())
             .extracting(Product::getName, Product::getPrice)
-            .containsExactly(productDTO.getName(), productDTO.getPrice());
+            .containsExactly(productUpdateDTO.getName(), productUpdateDTO.getPrice());
     }
 
     @Test
