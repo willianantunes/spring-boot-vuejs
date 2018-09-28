@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -20,7 +19,7 @@ import java.math.BigDecimal;
 public class Product implements Serializable {
 
     @NotBlank
-    private String id = new ObjectId().toString();
+    private String id;
     @NotBlank
     @Indexed(unique = true)
     private String code;
