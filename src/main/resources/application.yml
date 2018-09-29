@@ -10,4 +10,22 @@ spring:
       database: testDb
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+    - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      # We use Webpack dev server + BrowserSync for livereload
+      enabled: false
+
+custom:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    exposed-headers: "Authorization,Link,X-Total-Count"
+    allow-credentials: true
+    max-age: 1800
+
+server:
+  port: 8081
